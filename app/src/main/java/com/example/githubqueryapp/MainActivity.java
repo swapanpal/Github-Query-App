@@ -8,7 +8,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +31,12 @@ public class MainActivity extends AppCompatActivity {
     // Member variable for the SearchResults TextView
    private TextView mSearchResultsTextView;
 
+    //  Create a variable to store a reference to the error message TextView
+    private TextView mErrorMessageDisplay;
+
+    //  Create a ProgressBar variable to store a reference to the ProgressBar
+    private ProgressBar mLoadingIndicator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         mSearchResultsTextView = (TextView) findViewById(R.id.tv_github_search_results_json);
 
     }
+
 
     /**
      * This method retrieves the search text from the EditText, constructs
@@ -61,9 +70,47 @@ public class MainActivity extends AppCompatActivity {
         // Create a new GithubQueryTask and call its execute method, passing in the url to query
         new GithubQueryTask().execute(githubSearchUrl);
     }
+    // COMPLETED (14) Create a method called showJsonDataView to show the data and hide the error
+    /**
+     * This method will make the View for the JSON data visible and
+     * hide the error message.
+     * <p>
+     * Since it is okay to redundantly set the visibility of a View, we don't
+     * need to check whether each view is currently visible or invisible.
+     */
+    private void showJsonDataView(){
+        // First, make sure the error is invisible
+        mErrorMessageDisplay.setVisibility(View.INVISIBLE);
+
+        // Then, make sure the JSON data is visible
+        mSearchResultsTextView.setVisibility(View.VISIBLE);
+    }
+
+    // COMPLETED (15) Create a method called showErrorMessage to show the error and hide the data
+    /**
+     * This method will make the error message visible and hide the JSON
+     * View.
+     * <p>
+     * Since it is okay to redundantly set the visibility of a View, we don't
+     * need to check whether each view is currently visible or invisible.
+     */
+    private void showErrorMessage(){
+        // First, hide the currently visible data
+        mSearchResultsTextView.setVisibility(View.INVISIBLE);
+
+        // Then, show the error
+        mErrorMessageDisplay.setVisibility(View.VISIBLE);
+
+    }
 
     //Create a class called GithubQueryTask that extends AsyncTask<URL, Void, String>
     public class GithubQueryTask extends AsyncTask<URL, Void, String> {
+        //  Override onPreExecute to set the loading indicator to visible
+        @Override
+        protected void onPreExecute() {
+            mLoadingIndicator.setVisibility(View.VISIBLE);
+
+        }
 
         //  Override the doInBackground method to perform the query. Return the results.
         //  (Hint: You've already written the code to perform the query)
@@ -84,8 +131,17 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String githubSearchResults) {
+            //  As soon as the loading is complete, hide the loading indicator
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
+
             if (githubSearchResults != null && !githubSearchResults.equals("")){
+                //  Call showJsonDataView if we have valid, non-null results
+                showJsonDataView();
+
                 mSearchResultsTextView.setText(githubSearchResults);
+            }else {
+                //  Call showErrorMessage if the result is null in onPostExecute
+                showErrorMessage();
             }
 
         }

@@ -2,4 +2,7 @@
     <string name="app_name">Github Query App</string>
 
     <string name="search">Search</string>
+
+    <!-- Add a string stating that an error has occurred-->
+    <string name="error_message">Failed to get results. Please try again.</string>
 </resources>
