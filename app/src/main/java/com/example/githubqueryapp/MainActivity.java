@@ -3,6 +3,7 @@ package com.example.githubqueryapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -37,6 +38,12 @@ public class MainActivity extends AppCompatActivity {
     //  Create a ProgressBar variable to store a reference to the ProgressBar
     private ProgressBar mLoadingIndicator;
 
+    /* A constant to save and restore the URL that is being displayed */
+    private static final String SEARCH_QUERY_URL_EXTRA = "query";
+
+    /* A constant to save and restore the JSON that is being displayed */
+    private static final String SEARCH_RESULTS_RAW_JSON = "results";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +57,17 @@ public class MainActivity extends AppCompatActivity {
 
         // C Use findViewById to get a reference to mSearchResultsTextView
         mSearchResultsTextView = (TextView) findViewById(R.id.tv_github_search_results_json);
+
+        //  If the savedInstanceState bundle is not null, set the text of the URL and
+        //  search results TextView respectively
+
+        if (savedInstanceState != null) {
+            String queryUrl = savedInstanceState.getString(SEARCH_QUERY_URL_EXTRA);
+            String rawJsonSearchResults = savedInstanceState.getString(SEARCH_RESULTS_RAW_JSON);
+
+            mUrlDisplayTextView.setText(queryUrl);
+            mSearchResultsTextView.setText(rawJsonSearchResults);
+        }
 
     }
 
@@ -160,5 +178,28 @@ public class MainActivity extends AppCompatActivity {
             makeGithubSearchQuery();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    // Override onSaveInstanceState to persist data across Activity recreation
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // COMPLETED (4) Make sure super.onSaveInstanceState is called before doing anything else
+        super.onSaveInstanceState(outState);
+
+        // COMPLETED (5) Put the contents of the TextView that contains our URL into a variable
+        String queryUrl = mUrlDisplayTextView.getText().toString();
+
+        // COMPLETED (6) Using the key for the query URL, put the string in the outState Bundle
+        outState.putString(SEARCH_QUERY_URL_EXTRA, queryUrl);
+
+
+        // COMPLETED (7) Put the contents of the TextView that contains our raw JSON search results
+        //  into a variable
+        String rawJsonSearchResults = mSearchResultsTextView.getText().toString();
+
+        // COMPLETED (8) Using the key for the raw JSON search results, put the search results into the outState Bundle
+        outState.putString(SEARCH_RESULTS_RAW_JSON, rawJsonSearchResults);
+
+
     }
 }
